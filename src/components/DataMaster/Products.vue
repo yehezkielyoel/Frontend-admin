@@ -17,12 +17,12 @@
       :fields="fields" 
       :borderless="borderless">
 
-      <template #cell(action)="item">
-        <b-button variant="link" class="iconEdit" @click="editItem(item)" v-b-modal.modal-center>
+      <template #cell(action)="items">
+        <b-button variant="link" class="iconEdit" @click="editItem(items.item)" v-b-modal.modal-center>
           <b-icon icon="pencil-fill"></b-icon>
         </b-button>
 
-        <b-button variant="link" class="iconDelete" @click="deleteItem(item)" v-b-modal.modal-delete>
+        <b-button variant="link" class="iconDelete" @click="deleteItem(items.item)" v-b-modal.modal-delete>
           <b-icon icon="X"></b-icon>
         </b-button>  
       </template>
@@ -41,32 +41,56 @@
 
         <!-- <b-card-text> -->
           <b-container>
-              <b-icon icon="tag-fill" class="iconForm"></b-icon>
-              <b-form-input type="text" style="background-color: #CED4DA;"
+             
+              <b-input-group class="mb-2">
+              <b-input-group-prepend is-text>
+                <b-icon icon="tag-fill" style="color:#151D65;"></b-icon>
+              </b-input-group-prepend>
+               <b-form-input type="text" style="background-color: #CED4DA;"
                   v-model="form.product_name"
-                  placeholder="   Product name"
+                  placeholder="Product name"
                   required
                   autofocus></b-form-input>
+              </b-input-group>
 
-              <b-icon icon="archive-fill" class="iconForm"></b-icon>
-              <b-form-input style="background-color: #CED4DA;"
+              <b-input-group class="mb-2">
+              <b-input-group-prepend is-text>
+                <b-icon icon="tag-fill" style="color:#151D65;"></b-icon>
+              </b-input-group-prepend>
+               <b-form-input type="text" style="background-color: #CED4DA;"
+                  v-model="form.deskripsi_product"
+                  placeholder="Deskripsi produk"
+                  required
+                ></b-form-input>
+              </b-input-group>
+
+              <b-input-group class="mb-2">
+              <b-input-group-prepend is-text>
+                <b-icon icon="archive-fill" style="color:#151D65;"></b-icon>
+              </b-input-group-prepend>
+               <b-form-input style="background-color: #CED4DA;"
                   v-model="form.stock"
-                  placeholder="   Stock"
+                  placeholder="Stock"
                   required></b-form-input>
-              
-              <b class="iconForm">Rp</b>
-              <b-form-input style="background-color: #CED4DA;"
+              </b-input-group>
+            
+            <b-input-group class="mb-2">
+              <b-input-group-prepend is-text>
+                <b  style="color:#151D65;">Rp</b>
+              </b-input-group-prepend>
+               <b-form-input style="background-color: #CED4DA;"
                   v-model="form.price"
-                  placeholder="   Price"
+                  placeholder="Price"
                   required
                   number
                     ></b-form-input>
-              <br>
+              </b-input-group>
+
               <b-form-file 
-                v-model="file1"
+                v-model="form.file1"
                 class="mt-3"
                 placeholder="Choose a file or drop it here..."
-                plain></b-form-file>
+                ></b-form-file>
           </b-container>
         <!-- </b-card-text> -->
           <br><br>
@@ -78,7 +102,7 @@
               Save
             </b-button>
             <b-button v-else
-              @click="edit(form)" 
+              @click="edit" 
               style="background-color: #151D65; font-weight: bold;"
               text
               class="mr-1">
@@ -96,6 +120,15 @@
             <b-button variant="outline-light" @click="cancel" style="font-weight: bold; color: #151D65; ">No</b-button>
         </div>
     </b-modal>
+
+    <b-alert
+      v-model="snackbar"
+      class="position-fixed fixed-bottom m-0 rounded-0"
+      style="z-index: 2000;"
+      variant="success"
+      dismissible
+    >{{error_message}}</b-alert>
+
   </div>
 </body>
 </template>
@@ -105,57 +138,35 @@
     data() {
       return {
         adding: true,
-        edititem: null,
         dialog: false,
         dialogdel: false,
+        snackbar:false,
+        error_message: '',
+        color:'',
         busy: true,
         file1: null,
-        fields: [
-        //   { key: 'no',label: 'No'},
-        //   { key: 'product_name', label: 'Product Name'},
-        //   { key: 'stock', label: 'Stock(s)'},
-        //   { key: 'price', label: 'Price(Rp)'},
-        //   { key:'action', label: 'Action'}
-            {   
-                text: "No",
-                align: "start",
-                sortable: true,
-                value: "no",
-            },
-            {   
-                text: "Product Name",
-                sortable: true,
-                value: "product_name",
-            },
-            {   
-                text: "Stock(s)",
-                sortable: true,
-                value: "stock",
-            },
-            {   
-                text: "Price(Rp)",
-                sortable: false,
-                value: "price",
-            },
-            {   
-                text: "Actions",
-                sortable: false,
-                value: "action",
-            },
+        fields:[
+        {key: 'nama_product'},
+        {key: 'stok_product'},
+        {key: 'harga_product'},
+        {key: 'action'},
+        {key: 'created_at', thClass: 'd-none', tdClass: 'd-none'},
         ],
+        item: new FormData,
         items: [
-          { no: 1, product_name: 'Chicken Ball Champ', stock: '5', price: '150.000', action: "",},
-          { no: 2, product_name: 'Fiesta Chicken Nugget', stock: '10', price: '290.000', action: "",},
-          { no: 3, product_name: 'Fiesta Katsu', stock: '3', price: '35.000', action: "",},
+  
         ],
         form: {
           product_name: null,
+          deskripsi_product:null,
           stock: null,
           price:null,
           file1:null,
+          id:null,
       },
       detail: {
           product_name:null,
+          deskripsi_product:null,
           stock: null,
           price: null,
           file1: null,
@@ -165,9 +176,51 @@
       borderless: true,
       };
     },
+    beforeMount(){
+      this.readData()
+    },
     methods:{
+      readData() {
+      var url = this.$api + '/product'
+      this.$http.get(url, {
+        headers: {
+          'Authorization': 'Bearer ' + localStorage.getItem('token')
+        }
+      }).then(response => {
+        this.items = response.data.data
+        console.log(this.items);
+      })
+    },
       save() {
-            this.items.push(this.form);
+            this.item = new FormData;
+            this.item.append('nama_product',this.form.product_name);
+            this.item.append('deskripsi_product',this.form.deskripsi_product);
+            this.item.append('stok_product',this.form.stock);
+            this.item.append('harga_product',this.form.price);
+            this.item.append('gambar_product',this.form.file1);
+                  
+              var url = this.$api + '/product/'
+              this.load = true
+              this.$http.post(url, this.item, {
+                headers: {
+                  'Authorization': 'Bearer ' + localStorage.getItem('token')
+                }
+              }).then(response => {
+                this.error_message = response.data.message;
+                this.color = "green"
+                this.snackbar = true;
+                this.load = false;
+               // this.close();
+                this.readData(); //mengambil data
+                
+               // this.resetForm();
+              }).catch(error => {
+                this.error_message = error.response.data.message;
+                this.color = "red"
+                this.snackbar = true;
+              //  this.load = false;
+              })
+              
             this.cancel();
         },
       cancel() {
@@ -180,28 +233,97 @@
         },
       deleteItem(item) {
             this.dialogdel = true;
-            this.edititem = item;
+            this.deleteId=item.id;
         },
       confirmdelete() {
-            this.items.splice(this.items.indexOf(this.edititem), 1);
+            var url = this.$api + '/product/' + this.deleteId;
+            //data dihapus berdasarkan id
+            this.$http.delete(url, {
+              headers: {
+          'Authorization': 'Bearer ' + localStorage.getItem('token')
+          }
+           }).then(response => {
+            this.error_message = response.data.message;
+            this.color = "green"
+            this.snackbar = true;
+            this.load = false;
+            this.close();
+            this.readData(); //mengambil data
+          }).catch(error => {
+            this.error_message = error.response.data.message;
+            this.color = "red"
+            this.snackbar = true;
+            this.load = false;
+          })
             this.dialogdel = false;
         },
+        //untuk form edit modal
       editItem(item) {
             this.adding = false;
-            this.form = {
-                product_name: item.product_name,
-                stock: item.stock,
-                price: item.price,
-                file1: item.file1,
-            };
+            this.form.product_name= item.nama_product;
+            this.form.stock= item.stok_product;
+            this.form.price= item.harga_product;
+            this.form.deskripsi_product=item.deskripsi_product;
+            this.form.id=item.id;
             this.dialog = true;
             this.edititem = item;
         },
-      edit(form){
-            this.edititem.product_name = form.product_name;
-            this.edititem.stock = form.stock;
-            this.edititem.price = form.price;
-            this.edititem.file1 = form.file1;
+        //save edit
+      edit(){
+            let newData = {
+              nama_product : this.form.product_name,
+              deskripsi_product : this.form.deskripsi_product,
+              stok_product : this.form.stock,
+              harga_product : this.form.price,
+            }
+                  
+              var url = this.$api + '/product/' + this.form.id
+              this.load = true
+              this.$http.put(url, newData, {
+                headers: {
+                  'Authorization': 'Bearer ' + localStorage.getItem('token')
+                }
+              }).then(response => {
+                this.error_message = response.data.message;
+                this.color = "green"
+                this.snackbar = true;
+                this.load = false;
+               // this.close();
+                this.readData(); //mengambil data
+                
+               // this.resetForm();
+              }).catch(error => {
+                this.error_message = error.response.data.message;
+                this.color = "red"
+                this.snackbar = true;
+              //  this.load = false;
+              })
+
+              let item=new FormData();
+              item.append('gambar_product', this.form.file1);
+              console.log(item);
+              var url = this.$api + '/product/gambar_product/'+this.form.id;
+              this.load = true
+              this.$http.post(url, item, {
+                headers: {
+                  
+                  'Authorization': 'Bearer ' + localStorage.getItem('token')
+                }
+              }).then(response => {
+                this.error_message = response.data.message;
+                this.color = "green"
+                this.snackbar = true;
+    
+                this.close();
+                this.readData(); //mengambil data
+                this.resetForm();
+              }).catch(error => {
+                this.error_message = error.response.data.message;
+                this.color = "red"
+                this.snackbar = true;
+                this.load = false;
+              })
+              
             this.cancel();
         },
       resetForm() {
@@ -213,6 +335,14 @@
             };
         },  
 
+    
     },
+    
   };
 </script>
+
+<style scoped>
+.iconStyle{
+  margin: 5px;
+}
+</style>

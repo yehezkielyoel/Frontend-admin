@@ -1,10 +1,10 @@
 <template>
   <div id="app">
-    <v-main>
+
       <b-container fluid>
         <router-view></router-view>
       </b-container>
-    </v-main>
+
   </div>
 </template>
 
