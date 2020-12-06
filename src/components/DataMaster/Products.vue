@@ -211,7 +211,7 @@
                 this.snackbar = true;
                 this.load = false;
                // this.close();
-                this.readData(); //mengambil data
+                  this.readData(); //mengambil data
                 
                // this.resetForm();
               }).catch(error => {
@@ -219,8 +219,7 @@
                 this.color = "red"
                 this.snackbar = true;
               //  this.load = false;
-              })
-              
+              })            
             this.cancel();
         },
       cancel() {
@@ -302,11 +301,10 @@
               let item=new FormData();
               item.append('gambar_product', this.form.file1);
               console.log(item);
-              var url = this.$api + '/product/gambar_product/'+this.form.id;
+              url = this.$api + '/product/gambar_product/'+this.form.id;
               this.load = true
               this.$http.post(url, item, {
                 headers: {
-                  
                   'Authorization': 'Bearer ' + localStorage.getItem('token')
                 }
               }).then(response => {
@@ -336,6 +334,9 @@
         },  
 
     
+    },
+    mounted() {
+      this.readData();
     },
     
   };
