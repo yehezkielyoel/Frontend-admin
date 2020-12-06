@@ -17,12 +17,12 @@
       :fields="fields" 
       :borderless="borderless">
 
-      <template #cell(action)="item">
-        <b-button variant="link" class="iconEdit" @click="editItem(item)" v-b-modal.modal-center>
+      <template #cell(action)="items">
+        <b-button variant="link" class="iconEdit" @click="editItem(items.item)" v-b-modal.modal-center>
           <b-icon icon="pencil-fill"></b-icon>
         </b-button>
 
-        <b-button variant="link" class="iconDelete" @click="deleteItem(item)" v-b-modal.modal-delete>
+        <b-button variant="link" class="iconDelete" @click="deleteItem(items.item)" v-b-modal.modal-delete>
           <b-icon icon="X"></b-icon>
         </b-button>  
       </template>
@@ -37,24 +37,37 @@
             v-else>Edit Location</span>
         </b-card-title>
           <b-container>
-              <b-icon class="iconForm" icon="geo-alt-fill"></b-icon>
+
+            <b-input-group class="mb-2">
+              <b-input-group-prepend is-text>
+                 <b-icon icon="geo-alt-fill" style="color:#151D65;"></b-icon>
+              </b-input-group-prepend>
               <b-form-input type="text" style="background-color: #CED4DA;"
-                  v-model="form.regency"
-                  placeholder="   Regency"
+                  v-model="form.region"
+                  placeholder="region"
                   required></b-form-input>
+              </b-input-group>
 
-              <b-icon class="iconForm" icon="globe2"></b-icon>
-              <b-form-input style="background-color: #CED4DA;"
+              
+            <b-input-group class="mb-2">
+              <b-input-group-prepend is-text>
+                 <b-icon icon="globe2" style="color:#151D65;"></b-icon>
+              </b-input-group-prepend>
+               <b-form-input style="background-color: #CED4DA;"
                   v-model="form.subDistrict"
-                  placeholder="   Sub-district"
+                  placeholder="Sub-district"
                   required></b-form-input>
+              </b-input-group>
 
-              <b class="iconForm">Rp</b>
-              <b-form-input style="background-color: #CED4DA;"
+              <b-input-group class="mb-2">
+              <b-input-group-prepend is-text>
+                <b style="color:#151D65;">Rp</b>
+              </b-input-group-prepend>
+                <b-form-input style="background-color: #CED4DA;"
                   v-model="form.shipping"
-                  placeholder="   Shipping"
+                  placeholder="Shipping"
                   required></b-form-input>
-              <br>
+              </b-input-group>
               
             <b-button v-if="adding == true"
                @click="save"
@@ -64,7 +77,7 @@
                Save
             </b-button>
             <b-button v-else
-               @click="edit(form)"
+               @click="edit"
                style="background-color: #151D65; font-weight: bold;"  
                class="mr-1"
                >
@@ -81,6 +94,14 @@
             <b-button variant="outline-light" @click="cancel" style="font-weight: bold; color: #151D65; ">no</b-button>
         </div>
     </b-modal>
+
+    <b-alert
+      v-model="snackbar"
+      class="position-fixed fixed-bottom m-0 rounded-0"
+      style="z-index: 2000;"
+      variant="Success"
+      dismissible
+    >{{error_message}}</b-alert>
   </div>
 </body>
 </template>
@@ -93,26 +114,26 @@
         edititem: null,
         dialog: false,
         dialogdel: false,
+        error_message:null,
+        variant:null,
         busy: true,
         fields: [
-          { key: 'no',label: 'No'},
-          { key: 'regency', label: 'Regency'},
-          { key: 'subDistrict', label: 'Sub-district'},
-          { key: 'shipping', label: 'Shipping Price(Rp)'},
+          { key: 'id',label: 'ID'},
+          { key: 'region', label: 'Region'},
+          { key: 'sub_district', label: 'Sub-district'},
+          { key: 'harga_ongkir', label: 'Shipping Price(Rp)'},
           { key:'action', label: 'Action'}
         ],
-        items: [
-          { no: 1, regency: 'Yogyakarta', subDistrict: 'Umbulharjo', shipping: '2.000', action: ''},
-          { no: 2, regency: 'Yogyakarta', subDistrict: 'Jetis', shipping: '2.000', action: ''},
-          { no: 3, regency: 'Sleman', subDistrict: 'Depok', shipping: '2.000', action: ''},
-        ],
+        item: new FormData,
+        items: [],
         form: {
-          regency: null,
+          region: null,
           subDistrict: null,
           shipping:null,
+          id:null,
       },
         detail:{
-            regency: null,
+            region: null,
           subDistrict: null,
           shipping:null,
         },
@@ -121,9 +142,47 @@
       borderless: true,
       };
     },
+    beforeMount(){
+      this.readData()
+    },
     methods:{
+       readData() {
+      var url = this.$api + '/ongkir'
+      this.$http.get(url, {
+        headers: {
+          'Authorization': 'Bearer ' + localStorage.getItem('token')
+        }
+      }).then(response => {
+        this.items = response.data.data
+
+      })
+      },
       save() {
-            this.items.push(this.form);
+            this.item = new FormData;
+            this.item.append('region',this.form.region);
+            this.item.append('sub_district',this.form.subDistrict);
+            this.item.append('harga_ongkir',this.form.shipping);
+        
+                  
+              var url = this.$api + '/ongkir/'
+              this.load = true
+              this.$http.post(url, this.item, {
+                headers: {
+                  'Authorization': 'Bearer ' + localStorage.getItem('token')
+                }
+              }).then(response => {
+                this.error_message = response.data.message;
+                this.variant="Success"
+                this.snackbar = true;
+                this.load = false;
+                this.readData(); //mengambil data
+                this.resetForm();
+              }).catch(error => {
+                this.error_message = error.response.data.message;
+                this.variant="Danger"
+                this.snackbar = true;
+              })
+              
             this.cancel();
         },
       cancel() {
@@ -135,34 +194,74 @@
         },
       deleteItem(item) {
             this.dialogdel = true;
-            this.edititem = item;
+            this.deleteId=item.id;
         },
       confirmdelete() {
-            this.items.splice(this.items.indexOf(this.edititem), 1);
-            this.dialogdel = false;
+
+            var url = this.$api + '/ongkir/' + this.deleteId;
+            //data dihapus berdasarkan id
+            this.$http.delete(url, {
+              headers: {
+          'Authorization': 'Bearer ' + localStorage.getItem('token')
+          }
+           }).then(response => {
+            this.error_message = response.data.message;
+            this.color = "green"
+            this.snackbar = true;
+            this.close();
+            this.readData(); //mengambil data
+    
+          }).catch(error => {
+            this.error_message = error.response.data.message;
+            this.color = "red"
+            this.snackbar = true;
+            this.load = false;
+          })
+           
         },
       editItem(item) {
             this.adding = false;
-            this.form = {
-                regency: item.regency,
-                subDistrict: item.subDistrict,
-                shipping: item.shipping,
-            };
+            this.form.region= item.region;
+            this.form.subDistrict= item.sub_district;
+            this.form.shipping= item.harga_ongkir;
             this.dialog = true;
-            this.edititem = item;
+            this.form.id=item.id;
         },
-      edit(form){
-            this.edititem.regency = form.regency;
-            this.edititem.subDistrict = form.subDistrict;
-            this.edititem.shipping = form.shipping;
+      edit(){
+             let newData = {
+              region : this.form.region,
+              sub_district : this.form.subDistrict,
+              harga_ongkir : this.form.shipping,
+            }
+                  
+              var url = this.$api + '/ongkir/' + this.form.id
+              this.load = true
+              this.$http.put(url, newData, {
+                headers: {
+                  'Authorization': 'Bearer ' + localStorage.getItem('token')
+                }
+              }).then(response => {
+                this.error_message = response.data.message;
+                this.color = "green"
+                this.snackbar = true;
+                this.load = false;
+               // this.close();
+                this.readData(); //mengambil data
+                
+               // this.resetForm();
+              }).catch(error => {
+                this.error_message = error.response.data.message;
+                this.color = "red"
+                this.snackbar = true;
+              //  this.load = false;
+              })
+
             this.cancel();
         },
       resetForm() {
-            this.form = {
-                regency: null,
-                subDistrict: null,
-                shipping: null,
-            };
+            this.form.region= null;
+            this.form.subDistrict= null;
+            this.form.shipping= null;
         },  
     },
   };

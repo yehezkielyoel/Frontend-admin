@@ -6,6 +6,10 @@ import App from './App.vue'
 import router from './router'
 import axios from 'axios'
 
+import axios from 'axios'
+
+Vue.prototype.$http = axios;
+Vue.prototype.$api = 'http://127.0.0.1:8000/api';
 
 Vue.prototype.$http = axios;
 Vue.prototype.$api = 'http://127.0.0.1:8000/api';
