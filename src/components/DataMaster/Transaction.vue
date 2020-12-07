@@ -9,7 +9,7 @@
       </div>
     </h1>
     <br>
-    <b-button variant="danger" ><b-icon icon="printer"></b-icon> Print</b-button>
+    <b-button variant="danger" @click="generatePDF" ><b-icon icon="printer"></b-icon> Print</b-button>
     <br><br>
 
     <b-table class="tabelAcc" striped hover 
@@ -17,63 +17,14 @@
       :fields="fields" 
       :borderless="borderless">
 
-      <!-- <template #cell(action)="item">
-        <b-button variant="link" id="iconEdit" @click="editItem(item)" v-b-modal.modal-center>
-          <b-icon icon="pencil-fill"></b-icon>
-        </b-button> -->
-
-        <!-- <b-button variant="link" id="iconDelete" @click="deleteItem(item)" v-b-modal.modal-delete>
-          <b-icon icon="X"></b-icon>
-        </b-button>  
-      </template> -->
-
     </b-table>
-    <!-- modal edit -->
-    <!-- <b-modal hide-footer hide-header id="modal-center" centered>
-        <h1> Edit Account </h1>
-              <b-form-input type="text"
-                  v-model="form.name"
-                  placeholder="Name"
-                  required></b-form-input>
-              <br>
-              <b-form-input
-                  v-model="form.email"
-                  placeholder="Email"
-                  required></b-form-input>
-              <br>
-              <b-form-input
-                  v-model="form.password"
-                  placeholder="Password"
-                  required></b-form-input>
-              <br>
-              <b-form-input
-                  v-model="form.telp"
-                  placeholder="Telp"
-                  required></b-form-input>
-              <br>
-              <b-form-input
-                  v-model="form.address"
-                  placeholder="address"
-                  required>
-              </b-form-input>
-              <br>
-            <b-button @click="edit(form)" class="mr-1">save</b-button>
-            <b-button variant="light" style="color: #151D65;" @click="cancel" class="mr-1">cancel</b-button>
-            
-    </b-modal> -->
-    <!-- modal hapus -->
-    <!-- <b-modal hide-footer hide-header id="modal-delete" centered>
-        <div id="modDel">
-        <h1> Are you sure? </h1>
-            <b-button variant="outline-danger" @click="confirmdelete" style="font-weight: bold;" >yes</b-button>
-            <b-button variant="outline-light" @click="cancel" style="font-weight: bold; color: #151D65; ">no</b-button>
-        </div>
-    </b-modal> -->
   </div>
 </body>
 </template>
 
 <script>
+import { jsPDF } from "jspdf";
+
   export default {
     data() {
       return {
@@ -83,6 +34,7 @@
         dialogdel: false,
         dialognote: false,
         busy: true,
+
         fields: [
           { key: 'no',label: 'No'},
           { key: 'product_name', label: 'Product Name'},
@@ -94,6 +46,7 @@
           { no: 2, product_name: 'Fiesta Chicken Nugget', sold: '10', total: '650.000'},
           { no: 3, product_name: 'Fiesta Katsu', sold: '10', total: '105.000'},
         ],
+        
         form: {
           product_name: null,
           sold: null,
@@ -105,6 +58,54 @@
       };
     },
     methods:{
+        generatePDF() {
+            
+        // const { jsPDF } = require("jspdf");
+        const columns = [
+          { key: 'no',label: 'No'},
+          { key: 'product_name', label: 'Product Name'},
+          { key: 'sold', label: 'Sold Item(s)'},
+          { key: 'total', label: 'Total(Rp)'}
+        ];
+        
+        const doc = new jsPDF({
+            orientation: "portrait",
+            unit: "in",
+            format: "letter"
+        });
+        
+        // text is placed using x, y coordinates
+        // doc.setFontSize(16).text(this.heading, 0.5, 1.0); --ini
+        
+        // create a line under heading 
+        doc.setLineWidth(0.01).line(0.5, 1.1, 8.0, 1.1);
+        
+        // Using autoTable plugin
+        doc.autoTable({
+            columns,
+            body: this.item,
+            // margin: { left: 0.5, top: 1.25 }
+        }); 
+        
+        // Using array of sentences
+        // doc
+        //     .setFont("helvetica")
+        //     .setFontSize(12)
+        //     .text(this.moreText, 0.5, 3.5, { align: "left", maxWidth: "7.5" });
+        
+        // Creating footer and saving file
+        doc
+            // .setFont("times")
+            // .setFontSize(11)
+            // .setFontStyle("italic")
+            // .setTextColor(0, 0, 255)
+            .text(
+            "This is a simple footer located .5 inches from page bottom",
+            0.5,
+            doc.internal.pageSize.height - 0.5
+            )
+            .save(`Transaction.pdf`); 
+        console.log('adqwd')},
       save() {
             this.items.push(this.form);
             this.cancel();
@@ -126,7 +127,6 @@
                 address: null,
             };
         },
-
     },
   };
 </script>

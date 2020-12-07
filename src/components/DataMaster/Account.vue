@@ -121,6 +121,7 @@
       };
     },
     methods:{
+        
       save() {
             this.items.push(this.form);
             this.cancel();
@@ -169,7 +170,8 @@
                 telp: null,
                 address: null,
             };
-        },  
+        },
+          
 
     },
   };
