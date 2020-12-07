@@ -12,7 +12,7 @@
         </div>
       </h1>
       <br />
-      <b-button variant="danger" @click="exportPDF"
+      <b-button variant="danger" @click="generatePDF"
         ><b-icon icon="printer"></b-icon> Print</b-button
       >
       <br /><br />
@@ -84,8 +84,7 @@
 </template>
 
 <script>
-import * as jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import { jsPDF } from "jspdf";
 export default {
   data() {
     return {
@@ -99,6 +98,7 @@ export default {
       snackbar: false,
       error_message: "",
       color: "",
+      heading:"Froster's Transaction History",
       fields: [
         "no",
         { key: "nama_product", label: "Product Name" },
@@ -157,7 +157,7 @@ export default {
       ///tinggal hapus local storage di set pas login
       localStorage.setItem(
         "token",
-        "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIxIiwianRpIjoiNjExYWUzZDUwMDkxMWMyM2I4YzRjZDhjMzYwMDAzOTg3Nzk1M2QzYmM2OWRlMjZiYjQ1ZTUyZTFkMDFiYWJiMDMyMDM0MjBiYWFiOTgwMmMiLCJpYXQiOjE2MDcxNzQ3MjksIm5iZiI6MTYwNzE3NDcyOSwiZXhwIjoxNjM4NzEwNzI5LCJzdWIiOiI2Iiwic2NvcGVzIjpbXX0.nw_VPXpYiNPiw6YPcyu4f-GTs5B-p9DEtniyxvnFkYZFdJW4_VsOnjXdpNzuJXyxVu8AVpLrpY4WKVVQxBZJPmAyvKvmxw9X1F5YqCSfgmCn7ho7ZY391FrAuHu1_8KEwEsgc_Uzol_wHCqYxK67TGj3nZqXYkB6p-HVAI_9r8qeoLnzPl5ajrCLRmn57mhlRjMxIOvfT6aL_dR_3LlOqDG5aryRp1fh6eV7xT8ctsVfQrJG3f4L4-4knMxWcWO1eP6lH9d9xQO18bqVfG2AefyovIiW2lYem-VB-XYQNPzhVkuTsnDoF8Bnfz4WF7YdbazW6C8CcFl7aV502iTc4V90s2lkECimkf2TFVwk8j9Y8pWqmOCHKTMlBuFjIG-FbOEeNud2YxnGcAiq9RzG5uNOPegwtCmTWTolmpU8XcEwWIzvkbzpji9QAd76pvmZdJ13lHY7ODui8t5vcqgGZojhbAvo1U4hx1nXmV9We2gc9l1z_AQQvTPmdjIgGrdF5coD7wT-U_-_91fqL9FDqzJzjtIpwVIFu-vGP94bjSUCa5t0CL75-32ezeS8mjkltSEPvwpNe03GIBhN0hKJeILNMIMTDkT8JVilk1pMmaBIm2AYCfLfosi0LPKV9lVRcknNBMJp47Kv3xQAFfA-XQq6lHF8zQsNo9Fn-0jlfbQ"
+        "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIzIiwianRpIjoiNDc1MjQ5YWFiMzE5Mjc0NGQ0YjFkYTA0NDkzY2FmNWFkMmMyOGVkNDIwN2I5NTQ0NzU3M2NhYTlhOTdjYjFhMTczNzc2MzVkYzE1Y2YxODIiLCJpYXQiOjE2MDczNTUxMzgsIm5iZiI6MTYwNzM1NTEzOCwiZXhwIjoxNjM4ODkxMTM4LCJzdWIiOiIyIiwic2NvcGVzIjpbXX0.ZpOx7V8IjwFyIpjQzn-8xgDcy4-Cfj8f_M2g5mfgP4yDy7nboZVllhlrz-jRplI0M2SmEv469JPx8OEn_1ZksdKqZwfLMr5hcB_zpIzZaCaYtGg8naN7EhupU_-JgK6O_Ajrm28eEXN5X5MdH5qG-3qqjT8VAOAOT5d4k-fd_QcpQQPu-XIfYeDJJT3RH-hs7c6cC807Tf9B2RjlQhv123MvkeIH2eFktQDqMo4bep68NCIEpNsuWmjYiftdxXOryAvG4wEtTimawgFGHgxn2C6V8oA4a0uFJdjtdHPA2pmBwpzaMWzkOEnAwWZoCuWQzU6HNsLu22WODMlMEIO2bfL5ClR6bxwog_kQDyQD_V_E86u7PVwupCpK-wTLpdDLyZFwLYZKU5tSsVn-_nTwUOxGAUKKPUk6qVaD3sLsRLKBAsvhsXzmfbOlxb1k372PX3T-XWYHUcO477Ahbu8CiVBqZYtRgKrUB1anbpms0GRaYwsC7vk4l4A-q4j-nJp6Wl2Wuwf8dg_qdcEEeRgArdzOjtm1Ze8RP-RuTJGs2tawK2UWEp9CBNTq9rFLE2C_iNev_E5khrZn_ola2T9ypT6_R2ueqhDbWRpyDMISAonrIVdic4vkTyI5Lw9U6VrYWgkvDtTC1iz_rQ52KqY2BeS_JXZItcwXIipa-syOjqE"
       );
       var url = this.$api + "/transaksi";
       this.$http
@@ -173,21 +173,51 @@ export default {
         });
     },
     //blm jalann
-    exportPDF() {
-      var vm = this;
-      var columns = [
-        "no",
-        { title: "nama_product", dataKey: "Product Name" },
-        { title: "sold_items", dataKey: "Sold Item(s)" },
-        { title: "total", dataKey: "Total(Rp)" },
-      ];
-      var doc = new jsPDF();
-      doc.text("Transaction", 40, 40);
-      doc.autoTable(columns, vm.transaksi, {
-        margin: { top: 60 },
-      });
-      doc.save("todos.pdf");
-    },
+     generatePDF() {
+            
+        // const { jsPDF } = require("jspdf");
+        const columns = [
+          { key: 'nama_product', label: 'Product Name'},
+          { key: 'sold_items', label: 'Sold Item(s)'},
+          { key: 'total', label: 'Total(Rp)'}
+        ];
+        
+        const doc = new jsPDF({
+            orientation: "portrait",
+            unit: "in",
+            format: "letter"
+        });
+        
+        // text is placed using x, y coordinates
+         doc.setFontSize(16).text(this.heading, 0.5, 1.0); 
+        
+        // create a line under heading 
+        doc.setLineWidth(0.01).line(0.5, 1.1, 8.0, 1.1);
+        
+
+        // Using autoTable plugin  
+        doc.autoTable({
+              
+             columnStyles: { transaksi: { halign: 'center' } }, // European countries centered
+              body: this.transaksi,
+              columns: [
+                {tittle:"Transaction History"},
+                { header: 'Product Name', dataKey: 'nama_product' },
+                { header: 'Sold', dataKey:'sold_items'},
+                { header: 'Total (Rp)', dataKey:'total'},
+              ],
+              margin: { left: 0.5, top: 1.25 }
+        }); 
+     
+        
+        // Creating footer and saving file
+        doc.text(
+            "Transaction History",
+            0.5,
+            doc.internal.pageSize.height - 0.5
+            )
+            .save(`Transaction.pdf`); 
+        console.log('adqwd')},
   },
   computed: {},
   mounted() {
