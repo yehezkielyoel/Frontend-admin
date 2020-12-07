@@ -6,6 +6,7 @@ import App from './App.vue'
 import router from './router'
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 import { jsPDF } from "jspdf";
+import 'jspdf-autotable';
 
 Vue.config.productionTip = false
 

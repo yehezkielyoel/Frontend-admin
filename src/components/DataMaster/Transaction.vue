@@ -34,7 +34,7 @@ import { jsPDF } from "jspdf";
         dialogdel: false,
         dialognote: false,
         busy: true,
-
+        heading:"Froster's Transaction History",
         fields: [
           { key: 'no',label: 'No'},
           { key: 'product_name', label: 'Product Name'},
@@ -75,18 +75,28 @@ import { jsPDF } from "jspdf";
         });
         
         // text is placed using x, y coordinates
-        // doc.setFontSize(16).text(this.heading, 0.5, 1.0); --ini
+         doc.setFontSize(16).text(this.heading, 0.5, 1.0); 
         
         // create a line under heading 
         doc.setLineWidth(0.01).line(0.5, 1.1, 8.0, 1.1);
         
+
         // Using autoTable plugin
+  
+      
         doc.autoTable({
-            columns,
-            body: this.item,
-            // margin: { left: 0.5, top: 1.25 }
+              
+             columnStyles: { items: { halign: 'center' } }, // European countries centered
+              body: this.items,
+              columns: [
+                {tittle:"Transaction History"},
+                { header: 'No', dataKey: 'no' },
+                { header: 'Product Name', dataKey: 'product_name' },
+                { header: 'Sold', dataKey:'sold'},
+                { header: 'Total (Rp)', dataKey:'total'},
+              ],
+              margin: { left: 0.5, top: 1.25 }
         }); 
-        
         // Using array of sentences
         // doc
         //     .setFont("helvetica")
@@ -100,7 +110,7 @@ import { jsPDF } from "jspdf";
             // .setFontStyle("italic")
             // .setTextColor(0, 0, 255)
             .text(
-            "This is a simple footer located .5 inches from page bottom",
+            "Transaction History",
             0.5,
             doc.internal.pageSize.height - 0.5
             )
