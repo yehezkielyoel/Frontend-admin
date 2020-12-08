@@ -155,10 +155,6 @@ export default {
     },
     readData() {
       ///tinggal hapus local storage di set pas login
-      localStorage.setItem(
-        "token",
-        "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiIzIiwianRpIjoiNDc1MjQ5YWFiMzE5Mjc0NGQ0YjFkYTA0NDkzY2FmNWFkMmMyOGVkNDIwN2I5NTQ0NzU3M2NhYTlhOTdjYjFhMTczNzc2MzVkYzE1Y2YxODIiLCJpYXQiOjE2MDczNTUxMzgsIm5iZiI6MTYwNzM1NTEzOCwiZXhwIjoxNjM4ODkxMTM4LCJzdWIiOiIyIiwic2NvcGVzIjpbXX0.ZpOx7V8IjwFyIpjQzn-8xgDcy4-Cfj8f_M2g5mfgP4yDy7nboZVllhlrz-jRplI0M2SmEv469JPx8OEn_1ZksdKqZwfLMr5hcB_zpIzZaCaYtGg8naN7EhupU_-JgK6O_Ajrm28eEXN5X5MdH5qG-3qqjT8VAOAOT5d4k-fd_QcpQQPu-XIfYeDJJT3RH-hs7c6cC807Tf9B2RjlQhv123MvkeIH2eFktQDqMo4bep68NCIEpNsuWmjYiftdxXOryAvG4wEtTimawgFGHgxn2C6V8oA4a0uFJdjtdHPA2pmBwpzaMWzkOEnAwWZoCuWQzU6HNsLu22WODMlMEIO2bfL5ClR6bxwog_kQDyQD_V_E86u7PVwupCpK-wTLpdDLyZFwLYZKU5tSsVn-_nTwUOxGAUKKPUk6qVaD3sLsRLKBAsvhsXzmfbOlxb1k372PX3T-XWYHUcO477Ahbu8CiVBqZYtRgKrUB1anbpms0GRaYwsC7vk4l4A-q4j-nJp6Wl2Wuwf8dg_qdcEEeRgArdzOjtm1Ze8RP-RuTJGs2tawK2UWEp9CBNTq9rFLE2C_iNev_E5khrZn_ola2T9ypT6_R2ueqhDbWRpyDMISAonrIVdic4vkTyI5Lw9U6VrYWgkvDtTC1iz_rQ52KqY2BeS_JXZItcwXIipa-syOjqE"
-      );
       var url = this.$api + "/transaksi";
       this.$http
         .get(url, {
@@ -176,11 +172,11 @@ export default {
      generatePDF() {
             
         // const { jsPDF } = require("jspdf");
-        const columns = [
-          { key: 'nama_product', label: 'Product Name'},
-          { key: 'sold_items', label: 'Sold Item(s)'},
-          { key: 'total', label: 'Total(Rp)'}
-        ];
+        // const columns = [
+        //   { key: 'nama_product', label: 'Product Name'},
+        //   { key: 'sold_items', label: 'Sold Item(s)'},
+        //   { key: 'total', label: 'Total(Rp)'}
+        // ];
         
         const doc = new jsPDF({
             orientation: "portrait",
